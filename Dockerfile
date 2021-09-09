@@ -6,15 +6,12 @@
 # Authors:
 # - Paul Nilsson, paul.nilsson@cern.ch, 2021
 
-# build image with
-# docker build -t dask-pilot:latest .
-# docker images
-# docker tag 5086f307bdbc palnilsson/dask-worker:latest
-# docker push palnilsson/dask-pilot:latest
+# This Dockerfile is for creating a dask pilot image that can be used for executing dask user scripts. It requires
+# a running dask scheduler and worker(s). The yaml file (not yet included here) must define the scheduler IP as an
+# env variable ($DASK_SCHEDULER_IP) as well as a shared directory ($DASK_SHARED_FILESYSTEM_PATH).
+# The image is based on the continuumio/miniconda3:4.8.2 base image.
 
-# This Dockerfile is for creating a test dask pilot image for dask-cluster testing
-
-FROM atlasadc/atlas-grid-centos7:latest
+#FROM atlasadc/atlas-grid-centos7:latest
 FROM continuumio/miniconda3:4.8.2
 
 MAINTAINER Paul Nilsson
