@@ -7,6 +7,8 @@
 # Authors:
 # - Paul Nilsson, paul.nilsson@cern.ch, 2021
 
+# Note: this file must be executable
+
 echo "starting pilotx"
 pwd
 ls -lF

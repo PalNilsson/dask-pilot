@@ -7,6 +7,8 @@
 # Authors:
 # - Paul Nilsson, paul.nilsson@cern.ch, 2021
 
+# Note: this file must be executable
+
 set -x
 
 # We start by adding extra apt packages, since pip modules may required library
