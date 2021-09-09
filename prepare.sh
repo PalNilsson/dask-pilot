@@ -26,6 +26,7 @@ if [ -e "/opt/app/environment.yml" ]; then
 else
     echo "no environment.yml"
 fi
+whoami
 
 #if [ "$EXTRA_CONDA_PACKAGES" ]; then
 #    echo "EXTRA_CONDA_PACKAGES environment variable found.  Installing."

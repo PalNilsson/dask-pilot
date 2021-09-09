@@ -62,6 +62,7 @@ WORKDIR /home/dask
 CMD ["tini", "-g", "--", "/usr/bin/prepare.sh"]
 
 # Execute the pilot
+RUN chown dask:staff /home/dask
 RUN chown dask:staff /usr/bin/execute.sh
 USER dask
 ENTRYPOINT ["tini", "-g", "--", "/usr/bin/execute.sh"]

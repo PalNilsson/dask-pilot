@@ -10,7 +10,8 @@
 # Note: this file must be executable
 
 echo "starting pilotx"
+whoami
 pwd
-ls -lF
+ls -lF /home
 python3 /user/share/pilot-code/pilot.py
 echo "finished pilotx"
