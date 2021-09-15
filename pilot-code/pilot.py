@@ -14,6 +14,14 @@ import logging
 import time
 from dask.distributed import Client
 
+# pilot x version
+VERSION = "1.0.0.1"
+
+# error codes
+ERROR_UNSET_ENVVAR = 1
+ERROR_SCHEDULER = 2
+ERROR_JOBDEF = 3
+
 
 def establish_logging(debug=True, nopilotlog=False, filename="pilotx.stdout", loglevel=0):
     """
@@ -97,14 +105,14 @@ def open_file(filename, mode):
     :return: file pointer.
     """
 
-    f = None
+    _file = ""
     try:
-        f = open(filename, mode)
+        _file = open(filename, mode)
     except IOError as exc:
         logging.error("exception caught: %s", exc)
         # raise exc
 
-    return f
+    return _file
 
 
 def write_file(path, contents, mute=True, mode='w', unique=False):
@@ -144,27 +152,125 @@ def write_file(path, contents, mute=True, mode='w', unique=False):
     return status
 
 
+def get_job_definition_dict(job_id, shared_dir):
+    """
+    Locate the job definition in the shared directory matching the given job id.
+
+    :param job_id: PanDA job id (string).
+    :param shared_dir: shared directory path (string).
+    :return: job_definition_dict (dict).
+    """
+
+    job_definition_dict = {}
+
+    path = os.path.join(shared_dir, "job_definition-%s.json" % job_id)
+    if os.path.exists(path):
+        # read json
+        pass
+    else:
+        logging.warning('file does not exist: %s', path)
+
+    return job_definition_dict
+
+
+def get_required_vars_dict():
+    """
+    Create a dictionary with variables that are required.
+
+    The environment on the dask cluster expects the following env variables to be set
+    1. DASK_SCHEDULER_IP: the Dask scheduler IP (e.g. tcp://127.0.0.1:8786)
+    2. DASK_SHARED_FILESYSTEM_PATH: path to a shared directory used for pod communication, e.g. /mnt/dask
+    3. PANDA_ID: a PanDA job id, e.g. 123456789 (set it to e.g. this number for local testing)
+
+    The function returns a dictionary with the following format:
+       required_vars = {
+                        'host': $DASK_SCHEDULER_IP,
+                        'shared_disk': $DASK_SHARED_FILESYSTEM_PATH,
+                        'job_id': 'PANDA_ID'
+                        }
+    Keys and values will only be added if values are set.
+
+    :return: required_vars (Dictionary)
+    """
+
+    required_vars = {}
+    vars = {'host': 'DASK_SCHEDULER_IP', 'shared_disk': 'DASK_SHARED_FILESYSTEM_PATH', 'job_id': 'PANDA_ID'}
+    for var in vars:
+        _value = os.environ.get(vars[var], None)
+        if _value:
+            required_vars[var] = _value
+
+    required_vars['url'] = os.getenv('DASK_USERCODE_URL', 'http://cern.ch/atlas-panda-pilot/dask_script.py')
+
+    return required_vars
+
+
+def exit(exit_code):
+    """
+    Exit the pilot.
+
+    :param exit_code: exit code (integer).
+    :return:
+    """
+
+    logging.info('Pilot X has finished with exit code %d', exit_code)
+    shutdown()
+    sys.exit(exit_code)
+
+
 if __name__ == '__main__':
 
     establish_logging()
-    version = '1.0.0.0'
-    logging.info("Pilot X version %s", version)
+    logging.info("Pilot X version %s", VERSION)
     logging.info("Python version %s", sys.version)
     logging.info('working directory: %s', os.getcwd())
 
-    host = os.getenv('DASK_SCHEDULER_IP', None)
-    if not host:
-        logging.warning('failed to get scheduler IP')
+    exit_code = 0
+
+    # get env vars
+    required_vars = get_required_vars_dict()
+    host = required_vars.get('host')
+    url = required_vars.get('url')
+    job_id = required_vars.get('job_id')
+    shared_dir = required_vars.get('shared_dir')
+    if not host or not url or not job_id or not shared_dir:
+        logging.warning('failed to get scheduler IP (%s) / user code URL (%s) / job id (%s) / shared dir (%s)',
+                        str(host), str(url), str(job_id), str(shared_dir))
+        exit(ERROR_UNSET_ENVVAR)
     else:
-        # execute user code
+        logging.info('connecting to scheduler at %s', host)
+        client = Client(host)
+        if not client:
+            logging.warning('failed to get dask client')
+            exit(ERROR_SCHEDULER)
+
+        # get job definition matching PanDA job id (should be set in env var)
+        job_definition = get_job_definition_dict(job_id, shared_dir)
+        if not job_definition:
+            exit(ERROR_JOBDEF)
+
+        # stage-in any input
+        # (pass file list + metadata to stage-in/out pod "stageiox")
+        # stage-in/out pod should be launched before pilot pod
+        # pilot and stage-in/out pods communicate via the shared file system
+
+        # get user code
+        # (should later be in the job definition)
+        stdout, stderr = execute("wget %s" % url)
+
+        # wait for stage-in pod to finish
+        # ..
+
         try:
-            logging.info('connecting to scheduler at %s', host)
-            client = Client(host)
+            # execute user code when stage-in pod is done
+            # execute("python3 %s" % dask_script)
+            pass
         except Exception as exc:
-            logging.warning('caught exception: %s', exc)
+            logging.warning('caught exception while executing user code: %s', exc)
         else:
             logging.info('user code has finished')
 
-    logging.info('Pilot X has finished')
-    shutdown()
-    sys.exit(0)
+            # stage-out output
+            # (pass file list + metadata to stage-in/out pod "stageiox")
+
+    exit(0)
