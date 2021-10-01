@@ -185,7 +185,7 @@ def get_required_vars_dict():
     The function returns a dictionary with the following format:
        required_vars = {
                         'host': $DASK_SCHEDULER_IP,
-                        'shared_disk': $DASK_SHARED_FILESYSTEM_PATH,
+                        'shared_dir': $DASK_SHARED_FILESYSTEM_PATH,
                         'job_id': 'PANDA_ID'
                         }
     Keys and values will only be added if values are set.
@@ -194,7 +194,7 @@ def get_required_vars_dict():
     """
 
     required_vars = {}
-    vars = {'host': 'DASK_SCHEDULER_IP', 'shared_disk': 'DASK_SHARED_FILESYSTEM_PATH', 'job_id': 'PANDA_ID'}
+    vars = {'host': 'DASK_SCHEDULER_IP', 'shared_dir': 'DASK_SHARED_FILESYSTEM_PATH', 'job_id': 'PANDA_ID'}
     for var in vars:
         _value = os.environ.get(vars[var], None)
         if _value:
