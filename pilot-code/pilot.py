@@ -15,7 +15,7 @@ import time
 from dask.distributed import Client
 
 # pilot x version
-VERSION = "1.0.0.1"
+VERSION = "1.0.0.2"
 
 # error codes
 ERROR_UNSET_ENVVAR = 1
@@ -205,6 +205,23 @@ def get_required_vars_dict():
     return required_vars
 
 
+def setenv(vars):
+    """
+    Set environmental variables to the fields in the given dictionary.
+
+    Format: { 'field1': value1, .. }
+    ->
+    os.environ['field1'] = value1
+    ..
+
+    :param vars: environment fields and values (dictionary).
+    :return:
+    """
+
+    for var in vars:
+        os.environ[var] = vars[var]
+
+
 def exit(exit_code):
     """
     Exit the pilot.
@@ -238,6 +255,8 @@ if __name__ == '__main__':
                         str(host), str(url), str(job_id), str(shared_dir))
         exit(ERROR_UNSET_ENVVAR)
     else:
+        logging.warning('scheduler IP (%s) / user code URL (%s) / job id (%s) / shared dir (%s)',
+                        str(host), str(url), str(job_id), str(shared_dir))
         logging.info('connecting to scheduler at %s', host)
         client = Client(host)
         if not client:
@@ -245,9 +264,9 @@ if __name__ == '__main__':
             exit(ERROR_SCHEDULER)
 
         # get job definition matching PanDA job id (should be set in env var)
-        job_definition = get_job_definition_dict(job_id, shared_dir)
-        if not job_definition:
-            exit(ERROR_JOBDEF)
+        #job_definition = get_job_definition_dict(job_id, shared_dir)
+        #if not job_definition:
+        #    exit(ERROR_JOBDEF)
 
         # stage-in any input
         # (pass file list + metadata to stage-in/out pod "stageiox")
@@ -258,9 +277,25 @@ if __name__ == '__main__':
         # (should later be in the job definition)
         stdout, stderr = execute("wget %s" % url)
 
+        # set up required environment variables
+        vars = {'DASK_SCHEDULER_IP': host, 'DASK_SHARED_FILESYSTEM_PATH': shared_dir, 'PANDA_ID': job_id}
+        setenv(vars)
+
+def setenv(vars):
+    """
+
+    :param vars: (dictionary).
+    :return:
+    """
+
+    for var in vars:
+        os.environ[var] = vars[var]
+
         # wait for stage-in pod to finish
         # ..
 
+        # wait for workers to be ready
+        
         try:
             # execute user code when stage-in pod is done
             # execute("python3 %s" % dask_script)
