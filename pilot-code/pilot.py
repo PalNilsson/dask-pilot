@@ -278,18 +278,10 @@ if __name__ == '__main__':
         stdout, stderr = execute("wget %s" % url)
 
         # set up required environment variables
-        vars = {'DASK_SCHEDULER_IP': host, 'DASK_SHARED_FILESYSTEM_PATH': shared_dir, 'PANDA_ID': job_id}
+        vars = {'DASK_SCHEDULER_IP': host,
+                'DASK_SHARED_FILESYSTEM_PATH': shared_dir,
+                'PANDA_ID': job_id}
         setenv(vars)
-
-def setenv(vars):
-    """
-
-    :param vars: (dictionary).
-    :return:
-    """
-
-    for var in vars:
-        os.environ[var] = vars[var]
 
         # wait for stage-in pod to finish
         # ..
