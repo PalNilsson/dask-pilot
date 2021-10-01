@@ -290,8 +290,7 @@ if __name__ == '__main__':
         
         try:
             # execute user code when stage-in pod is done
-            # execute("python3 %s" % dask_script)
-            pass
+            execute("python3 %s" % os.path.basename(url))
         except Exception as exc:
             logging.warning('caught exception while executing user code: %s', exc)
         else:
