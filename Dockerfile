@@ -12,7 +12,7 @@
 # The image is based on the continuumio/miniconda3:4.8.2 base image.
 
 #FROM atlasadc/atlas-grid-centos7:latest
-FROM continuumio/miniconda3:4.8.2
+FROM continuumio/miniconda3:22.11.1
 
 MAINTAINER Paul Nilsson
 USER root
@@ -26,12 +26,12 @@ COPY --chown=dask:staff pilot3/ /user/share/pilot3/.
 
 RUN conda install --yes \
     -c conda-forge \
-    python==3.9 \
+    python==3.9.14 \
     python-blosc \
     cytoolz \
     lz4 \
     nomkl \
-    tini==0.18.0 \
+    tini==0.19.0 \
     && conda clean -tipy \
     && find /opt/conda/ -type f,l -name '*.a' -delete \
     && find /opt/conda/ -type f,l -name '*.pyc' -delete \
