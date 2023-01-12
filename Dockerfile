@@ -29,7 +29,7 @@ RUN conda install --yes \
     python==3.9 \
     python-blosc \
     cytoolz \
-    dask==2021.7.2 \
+    dask==2022.12.1 \
     lz4 \
     nomkl \
     numpy==1.21.1 \
