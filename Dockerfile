@@ -32,7 +32,7 @@ RUN conda install --yes \
     lz4 \
     nomkl \
     tini==0.18.0 \
-    && conda clean -tipsy \
+    && conda clean -tipy \
     && find /opt/conda/ -type f,l -name '*.a' -delete \
     && find /opt/conda/ -type f,l -name '*.pyc' -delete \
     && find /opt/conda/ -type f,l -name '*.js.map' -delete \
