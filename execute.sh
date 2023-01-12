@@ -5,12 +5,12 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 #
 # Authors:
-# - Paul Nilsson, paul.nilsson@cern.ch, 2021
+# - Paul Nilsson, paul.nilsson@cern.ch, 2023
 
 # Note: this file must be executable
 
 echo "starting pilotx"
 whoami
 pwd
-python3 /user/share/pilot-code/pilot.py
+python3 /user/share/pilot3/pilot.py
 echo "finished pilotx"

@@ -4,11 +4,11 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 #
 # Authors:
-# - Paul Nilsson, paul.nilsson@cern.ch, 2021
+# - Paul Nilsson, paul.nilsson@cern.ch, 2023
 
 name: myenv
 channels:
   - conda-forge
 dependencies:
-  - python=3.8
+  - python=3.9
   - flask

@@ -4,7 +4,7 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 #
 # Authors:
-# - Paul Nilsson, paul.nilsson@cern.ch, 2021
+# - Paul Nilsson, paul.nilsson@cern.ch, 2023
 
 # This Dockerfile is for creating a dask pilot image that can be used for executing dask user scripts. It requires
 # a running dask scheduler and worker(s). The yaml file (not yet included here) must define the scheduler IP as an
@@ -22,11 +22,11 @@ USER root
 RUN useradd --no-log-init -g staff dask
 
 # copy the pilot source
-COPY --chown=dask:staff pilot-code/ /user/share/pilot-code/.
+COPY --chown=dask:staff pilot3/ /user/share/pilot3/.
 
 RUN conda install --yes \
     -c conda-forge \
-    python==3.8 \
+    python==3.9 \
     python-blosc \
     cytoolz \
     dask==2021.7.2 \
