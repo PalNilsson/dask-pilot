@@ -32,7 +32,7 @@ RUN conda install --yes \
     dask==2022.12.1 \
     lz4 \
     nomkl \
-    numpy==1.21.1 \
+    numpy==1.24.1 \
     pandas==1.3.0 \
     tini==0.18.0 \
     && conda clean -tipsy \
