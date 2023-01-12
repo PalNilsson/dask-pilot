@@ -29,11 +29,8 @@ RUN conda install --yes \
     python==3.9 \
     python-blosc \
     cytoolz \
-    dask==2022.12.1 \
     lz4 \
     nomkl \
-    numpy==1.24.1 \
-    pandas==1.3.0 \
     tini==0.18.0 \
     && conda clean -tipsy \
     && find /opt/conda/ -type f,l -name '*.a' -delete \
