@@ -33,9 +33,11 @@ RUN conda install --yes \
     && find /opt/conda/ -type f,l -name '*.js.map' -delete \
     && rm -rf /opt/conda/pkgs
 
+RUN pip install rucio-clients
+
 COPY prepare.sh /usr/bin/prepare.sh
 COPY execute.sh /usr/bin/execute.sh
-RUN mkdir /opt/app
+RUN mkdir /opt/pilot
 
 # The following env vars must be used to connect the pilot to the dask scheduler and use the proper NFS mount point
 ARG DASK_SCHEDULER_IP
@@ -43,17 +45,23 @@ ARG DASK_SHARED_FILESYSTEM_PATH
 
 # Activate the environment, and make sure it's activated:
 RUN conda init bash
-COPY environment.yml /opt/app/.
-RUN conda env create -f /opt/app/environment.yml
+COPY environment.yml /opt/pilot/.
+RUN conda env create -f /opt/pilot/environment.yml
 RUN activate myenv
 
 WORKDIR /home/dask
+ENV RUCIO_HOME /home/dask/rucio
+RUN mkdir ${RUCIO_HOME}
+RUN mkdir ${RUCIO_HOME}/etc
+ENV RUCIO_CONFIG ${RUCIO_HOME}/etc/rucio.cfg
 
 # Execute the prepare script
 CMD ["tini", "-g", "--", "/usr/bin/prepare.sh"]
 
 # Execute the pilot
 RUN chown dask:staff /home/dask
+RUN chown dask:staff ${RUCIO_HOME}
+RUN chown dask:staff ${RUCIO_HOME}/etc
 RUN chown dask:staff /usr/bin/execute.sh
 USER dask
 ENTRYPOINT ["tini", "-g", "--", "/usr/bin/execute.sh"]

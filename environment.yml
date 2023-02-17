@@ -10,5 +10,4 @@ name: myenv
 channels:
   - conda-forge
 dependencies:
-  - python=3.9
   - flask

@@ -12,5 +12,13 @@
 echo "starting pilotx"
 whoami
 pwd
-python3 /user/share/pilot3/pilot.py
+which rucio
+echo $RUCIO_HOME
+# /opt/conda/bin/ has rucio binary
+cp /opt/conda/etc/rucio.cfg.template /home/dask/rucio/etc/rucio.cfg
+ls -lF /opt/conda/bin
+export $PYTHONPATH=/opt/conda/lib/
+rucio download
+#python3 -V
+#python3 /user/share/pilot3/pilot.py
 echo "finished pilotx"
